@@ -9,20 +9,20 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 public class Run {
+	public static class ApplicationSettings{
+		public static String readLocation;//file csv to read from
+		public static String writeLocation;//folder to write to
+	}
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		ColorSwatch c=new ColorSwatch();
-		
-		try {
-			if (ImageIO.write(ColorSwatch.MakeSwatch(90, 90, "#FFFFFF", "#000000", "#FFFFFF"), "png", new File("./output_image.png")))
-			{
-				System.out.println("-- saved");
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if(args.length==2) {
+			ApplicationSettings.readLocation=args[0];
+			ApplicationSettings.writeLocation=args[1];
 		}
+		Run run=new Run();
+		run.LoadSwatchFile(90, 90, ApplicationSettings.readLocation, ApplicationSettings.writeLocation);
+	
 	}
 	public void SaveSwatch(String location, BufferedImage swatch) {
 		
@@ -32,12 +32,11 @@ public class Run {
 					System.out.println("-- saved");
 				}
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		
 	}
-	public List<BufferedImage> LoadSwatchFile(int height, int width, String location) {
+	public List<BufferedImage> LoadSwatchFile(int height, int width, String location,String saveLocation) {
 		File zipsfile=new File(location);
 		FileReader fileReader;
 		ArrayList<BufferedImage> swatches=new ArrayList<BufferedImage>();
@@ -49,15 +48,20 @@ public class Run {
 
 			while ((line = bufferedReader.readLine()) != null) {
 				String[] swatchlist=line.split(",");
+				String savename=String.join("_", swatchlist);
 				BufferedImage img;
 				if(swatchlist.length==1) {
 					img=ColorSwatch.MakeSwatch(height, width, swatchlist[0]);
 				}
 				else if (swatchlist.length==2) {
 					img=ColorSwatch.MakeSwatch(height, width, swatchlist[0], swatchlist[1]);
+					
 				}
 				else {
 					img=ColorSwatch.MakeSwatch(height, width, swatchlist[0], swatchlist[1], swatchlist[2]);
+				}
+				if(img!=null) {
+				SaveSwatch(saveLocation+"\\"+savename.replace("#","")+".png",img);
 				}
 				swatches.add(img);
 
